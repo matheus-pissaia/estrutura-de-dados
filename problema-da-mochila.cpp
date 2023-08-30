@@ -2,34 +2,34 @@
 # include <iostream>
 
 struct Item {
-    unsigned int t, d;
-    float u, w, ratio;
+    unsigned int tipo, quantidade;
+    float utilidade, peso, ratio;
 };
 
-unsigned int C = 0;
+unsigned int capacidade_mochila;
 std::vector<Item> items = {};
 
 void read_input() {
     unsigned int count = 0;
 
     while (true) {
-        float u, w, d;
+        float utilidade, peso, quantidade;
 
-        std::cin >> u >> w >> d;
+        std::cin >> utilidade >> peso >> quantidade;
 
-        if (u != -1 && w != -1 && d != -1) {
+        if (utilidade != -1 && peso != -1 && quantidade != -1) {
             Item novo;
-            novo.t = count;
-            novo.u = u;
-            novo.w = w;
-            novo.d = d;
-            novo.ratio = u / w;
+            novo.tipo = count;
+            novo.utilidade = utilidade;
+            novo.peso = peso;
+            novo.quantidade = quantidade;
+            novo.ratio = utilidade / peso;
 
             items.push_back(novo);
             count++;
         }
         else {
-            std::cin >> C;
+            std::cin >> capacidade_mochila;
 
             break;
         }
@@ -54,28 +54,28 @@ void sort_items() {
 
 void select_items() {
     for (Item& item: items) {
-        if (item.d < 1)
+        if (item.quantidade < 1)
             continue;
 
-        if (C < 1) break;
+        if (capacidade_mochila < 1) break;
 
-        unsigned int quantidade_maxima_possivel = C / item.w;
+        unsigned int quantidade_maxima_possivel = capacidade_mochila / item.peso;
 
         if (quantidade_maxima_possivel < 1)
             continue;
 
         unsigned int quantidade_disponivel;
 
-        quantidade_maxima_possivel > item.d
-            ? quantidade_disponivel = item.d
+        quantidade_maxima_possivel > item.quantidade
+            ? quantidade_disponivel = item.quantidade
             : quantidade_disponivel = quantidade_maxima_possivel;
 
-        unsigned int peso_total = quantidade_disponivel * item.w;
+        unsigned int peso_total = quantidade_disponivel * item.peso;
 
-        C = C - peso_total;
+        capacidade_mochila = capacidade_mochila - peso_total;
 
         std::cout
-            << item.t
+            << item.tipo
             << " "
             << quantidade_disponivel
             << "\n";
