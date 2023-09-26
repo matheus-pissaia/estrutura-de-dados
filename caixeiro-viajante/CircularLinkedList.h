@@ -1,13 +1,9 @@
 # include <iostream>
 # include <cmath>
+# include <vector>
 
-struct Point {
+struct Node {
     int x, y;
-};
-
-struct Node
-{
-    struct Point *point;
     struct Node *next;
 };
 
@@ -23,12 +19,9 @@ class CircularLinkedList {
 
         // Inserts a new "city" with `x` and `y` coordinates at the end.
         void insert(int x, int y){
-            Point *new_point = new Point();
-            new_point->x = x;
-            new_point->y = y;
-
             Node *new_node = new Node();
-            new_node->point = new_point;
+            new_node->x = x;
+            new_node->y = y;
 
             if (not tail) {
                 tail = new_node;
@@ -50,61 +43,40 @@ class CircularLinkedList {
         };
 
         void improve_route(){
-            // There's no optimization for less then 4 points.
-            if (_size < 4)
-                return;
+            bool optimal_route = false;
 
-            // Note: in order to swap two nodes in a linked list, we need to have the previous and current Nodes references.
-            // For example: ... -> [Node previous A] -> [A] -> ... [Node previous B] -> [B] -> ...
-            Node *previousA = tail->next; // Head
-            Node *currentA = previousA->next;
+            double min_distance = calculate_total_distance();
+            double local_distance = 0;
 
-            // Starts comparison from head until it reaches the head again.
-            for (size_t i = 0; i < _size; i++){
-                Node *previousB = currentA;
-                Node *currentB = currentA->next;
+            Node *previous_node = tail;
+            Node *current_node = previous_node->next;
+            Node *next_node = current_node->next;
 
-                // Initialize previous and closest with next node from currentA
-                Node *previousClosestNode = NULL;
-                Node *closestNode = NULL;
+            while(not optimal_route) {
+                optimal_route = true;
 
-                // Initialize closest distance with next node from previousA
-                double closestNodeDistance = calculate_distance(previousA->point, currentA->point);
+                for (size_t i = 0; i < _size; i++){
+                    // Swap adjacent nodes order.
+                    auto aux = next_node->next;
+                    current_node->next = aux;
+                    next_node->next = current_node;
+                    previous_node->next = next_node;
 
-                // Starts comparison from the Node next from head until it reaches itself.
-                while(currentB != tail){
-                    // calculate distance and gets the Node with closest point from currentA
-                    double distance = calculate_distance(previousA->point, currentB->point);
+                    local_distance = calculate_total_distance();
 
-                    if (distance < closestNodeDistance) {
-                        closestNode = currentB;
-                        previousClosestNode = previousB;
-                        closestNodeDistance = distance;
+                    if (local_distance < min_distance) {
+                        min_distance = local_distance;
+                        optimal_route = false;
                     }
 
-                    // Update to next node
-                    previousB = currentB;
-                    currentB = currentB->next;
-                };
-
-                if (closestNode) {
-                    // Swap currentA with closestNode
-                    previousA->next = closestNode;
-                    previousClosestNode->next = currentA;
-
-                    auto temp = currentA->next;
-                    currentA->next = closestNode->next;
-                    closestNode->next = temp;
-
-                    // Update tail with currentA if closest node swaped was the tail
-                    if (closestNode == tail)
-                        tail = currentA;
+                    else {
+                        // Return adjacent nodes back to original order.
+                        next_node->next = aux;
+                        current_node->next = next_node;
+                        previous_node->next = current_node;
+                    }
                 }
-
-                // Update to next node
-                previousA = currentA;
-                currentA = currentA->next;
-            }
+            };
         };
 
         double calculate_total_distance(){
@@ -127,7 +99,7 @@ class CircularLinkedList {
             Node *current_city = tail->next; // Starting from head
 
             for (size_t i = 0; i < _size; i++) {
-                totalDistance += calculate_distance(current_city->point, current_city->next->point);
+                totalDistance += calculate_distance(current_city, current_city->next);
                 current_city = current_city->next;
             };
 
@@ -135,7 +107,7 @@ class CircularLinkedList {
         };
 
         // Calculates the distance between A and B points
-        double calculate_distance(Point* a, Point* b){
+        double calculate_distance(Node* a, Node* b){
             double dx = a->x - b->x;
             double dy = a->y - b->y;
             return sqrt(dx * dx + dy * dy);
@@ -144,8 +116,8 @@ class CircularLinkedList {
         void print(){
             auto pivot = tail->next; // Starts from head
 
-            for (size_t i = 0; i < _size; i++){
-                std::cout << pivot->point->x << " " << pivot->point->y << "\n";
+            for (size_t i = 0; i <= _size; i++){
+                std::cout << pivot->x << " " << pivot->y << "\n";
                 pivot = pivot->next;
             };
         };
