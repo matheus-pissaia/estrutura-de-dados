@@ -5,6 +5,10 @@
 Stack stack = Stack();
 std::vector<std::vector<char>> matrix = {};
 
+// Initialize the amount of columns and rows of the matrix
+int rows_length;
+int columns_length;
+
 void read_input() {
     std::string line;
 
@@ -15,8 +19,6 @@ void read_input() {
 }
 
 int get_island_size(int& initial_x, int& initial_y) {
-    int rows_length = matrix.size();
-    int columns_length = matrix[0].size();
     int island_size = 0;
 
     stack.push(initial_x, initial_y);
@@ -50,11 +52,10 @@ int get_island_size(int& initial_x, int& initial_y) {
 int main() {
     read_input();
 
-    int biggest_island_size = 0;
+    rows_length = matrix.size();
+    columns_length = matrix[0].size();
 
-    // Assign the amount of columns and rows of the matrix to each variable
-    int rows_length = matrix.size();
-    int columns_length = matrix[0].size();
+    int biggest_island_size = 0;
 
     for (int i = 0; i < rows_length; i++) {
         for (int j = 0; j < columns_length; j++) {
