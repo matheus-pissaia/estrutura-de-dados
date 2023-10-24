@@ -1,5 +1,5 @@
-# include <string>
-# include "HashTable.cpp"
+#include <string>
+#include "HashTable.cpp"
 
 HashTable read_input() {
     // Commands
